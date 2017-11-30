@@ -1,12 +1,13 @@
 ﻿import * as ts from "typescript";
-import {Node, SourceFile} from "./../../compiler";
-import {insertIntoCreatableSyntaxList} from "./insertIntoCreatableSyntaxList";
+import {Node, SyntaxList, SourceFile} from "./../../compiler";
+import {insertIntoParent} from "./insertIntoParent";
 
 export interface InsertIntoCommaSeparatedNodesOptions {
     currentNodes: Node[];
     insertIndex: number;
     newTexts: string[];
     parent: Node;
+    useNewlines?: boolean;
 }
 
 export function insertIntoCommaSeparatedNodes(opts: InsertIntoCommaSeparatedNodesOptions) {
@@ -14,35 +15,45 @@ export function insertIntoCommaSeparatedNodes(opts: InsertIntoCommaSeparatedNode
     const nextNode = currentNodes[insertIndex];
     const previousNode = currentNodes[insertIndex - 1];
     const numberOfSyntaxListItemsInserting = newTexts.length * 2 - 1;
+    const separator = getSeparator();
+    let newText = newTexts.join(`,${separator}`);
 
     if (nextNode != null) {
-        insertIntoCreatableSyntaxList({
-            parent,
+        insertIntoParent({
             insertPos: nextNode.getStart(),
-            newText: `${newTexts.join(", ")}, `,
-            syntaxList: nextNode.getParentSyntaxListOrThrow(),
+            newText: `${newText},${separator}`,
+            parent,
             childIndex: nextNode.getChildIndex(),
             insertItemsCount: numberOfSyntaxListItemsInserting + 1 // extra comma
         });
     }
     else if (previousNode != null) {
-        insertIntoCreatableSyntaxList({
-            parent,
+        insertIntoParent({
             insertPos: previousNode.getEnd(),
-            newText: `, ${newTexts.join(", ")}`,
-            syntaxList: previousNode.getParentSyntaxListOrThrow(),
+            newText: `,${separator}${newText}`,
+            parent,
             childIndex: previousNode.getChildIndex() + 1,
             insertItemsCount: numberOfSyntaxListItemsInserting + 1 // extra comma
         });
     }
     else {
-        insertIntoCreatableSyntaxList({
+        if (opts.useNewlines && currentNodes.length === 0)
+            newText = separator + newText + parent.global.manipulationSettings.getNewLineKind();
+
+        insertIntoParent({
+            insertPos: parent.getPos(),
             parent,
-            insertPos: parent.getFirstChildByKindOrThrow(ts.SyntaxKind.SyntaxList).getPos(),
-            syntaxList: parent.getFirstChildByKind(ts.SyntaxKind.SyntaxList),
-            newText: newTexts.join(", "),
+            newText,
             childIndex: 0,
-            insertItemsCount: numberOfSyntaxListItemsInserting
+            insertItemsCount: numberOfSyntaxListItemsInserting,
+            replacing: currentNodes.length === 0 ? { textLength: parent.getNextSiblingOrThrow().getStart() - parent.getPos(), nodes: [] } : undefined
         });
+    }
+
+    function getSeparator() {
+        if (!opts.useNewlines)
+            return " ";
+
+        return parent.global.manipulationSettings.getNewLineKind() + parent.getParentOrThrow().getChildIndentationText();
     }
 }
