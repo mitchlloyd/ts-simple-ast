@@ -147,8 +147,10 @@ export class ClassDeclaration extends ClassDeclarationBase<ts.ClassDeclaration> 
             c.remove();
         }
 
-        const structureToText = new structuresToText.ConstructorDeclarationStructureToText(this.global.manipulationSettings);
-        const code = structureToText.getTextWithIndentationText(structure, this.getChildIndentationText());
+        const writer = this.getChildWriter();
+        const structureToText = new structuresToText.ConstructorDeclarationStructureToText(writer);
+        structureToText.writeText(structure);
+        const code = writer.toString();
 
         return insertIntoBracesOrSourceFileWithFillAndGetChildren<ConstructorDeclaration, ConstructorDeclarationStructure>({
             getIndexedChildren: () => this.getBodyMembers(),
@@ -205,8 +207,13 @@ export class ClassDeclaration extends ClassDeclarationBase<ts.ClassDeclaration> 
         const indentationText = this.getChildIndentationText();
 
         // create code
-        const structureToText = new structuresToText.GetAccessorDeclarationStructureToText(this.global.manipulationSettings);
-        const codes = structureToText.getTextsWithIndentationText(structures, indentationText);
+        const codes = structures.map(s => {
+            // todo: pass in the StructureToText to the function below
+            const writer = this.getChildWriter();
+            const structureToText = new structuresToText.GetAccessorDeclarationStructureToText(writer);
+            structureToText.writeText(s);
+            return writer.toString();
+        });
 
         return insertIntoBracesOrSourceFileWithFillAndGetChildren<GetAccessorDeclaration, GetAccessorDeclarationStructure>({
             getIndexedChildren: () => this.getBodyMembers(),
@@ -258,8 +265,13 @@ export class ClassDeclaration extends ClassDeclarationBase<ts.ClassDeclaration> 
         const newLineKind = this.global.manipulationSettings.getNewLineKind();
 
         // create code
-        const structureToText = new structuresToText.SetAccessorDeclarationStructureToText(this.global.manipulationSettings);
-        const codes = structureToText.getTextsWithIndentationText(structures, indentationText);
+        const codes = structures.map(s => {
+            // todo: pass in the StructureToText to the function below
+            const writer = this.getChildWriter();
+            const structureToText = new structuresToText.SetAccessorDeclarationStructureToText(writer);
+            structureToText.writeText(s);
+            return writer.toString();
+        });
 
         return insertIntoBracesOrSourceFileWithFillAndGetChildren<SetAccessorDeclaration, SetAccessorDeclarationStructure>({
             getIndexedChildren: () => this.getBodyMembers(),
@@ -310,8 +322,13 @@ export class ClassDeclaration extends ClassDeclarationBase<ts.ClassDeclaration> 
         const indentationText = this.getChildIndentationText();
 
         // create code
-        const structureToText = new structuresToText.PropertyDeclarationStructureToText(this.global.manipulationSettings);
-        const codes = structureToText.getTextsWithIndentationText(structures, indentationText);
+        const codes = structures.map(s => {
+            // todo: pass in the StructureToText to the function below
+            const writer = this.getChildWriter();
+            const structureToText = new structuresToText.PropertyDeclarationStructureToText(writer);
+            structureToText.writeText(s);
+            return writer.toString();
+        });
 
         return insertIntoBracesOrSourceFileWithFillAndGetChildren<PropertyDeclaration, PropertyDeclarationStructure>({
             getIndexedChildren: () => this.getBodyMembers(),
@@ -441,8 +458,13 @@ export class ClassDeclaration extends ClassDeclarationBase<ts.ClassDeclaration> 
         const isAmbient = this.isAmbient();
 
         // create code
-        const structureToText = new structuresToText.MethodDeclarationStructureToText(this.global.manipulationSettings, { isAmbient });
-        const codes = structureToText.getTextsWithIndentationText(structures, indentationText);
+        const codes = structures.map(s => {
+            // todo: pass in the StructureToText to the function below
+            const writer = this.getChildWriter();
+            const structureToText = new structuresToText.MethodDeclarationStructureToText(writer, { isAmbient });
+            structureToText.writeText(s);
+            return writer.toString();
+        });
 
         // insert, fill, and get created nodes
         return insertIntoBracesOrSourceFileWithFillAndGetChildren<MethodDeclaration, MethodDeclarationStructure>({

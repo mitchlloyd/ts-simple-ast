@@ -48,13 +48,19 @@ export class ObjectLiteralExpression extends Expression<ts.ObjectLiteralExpressi
      */
     insertProperties(index: number, structures: ObjectLiteralElementLikeStructures[]) {
         index = verifyAndGetIndex(index, this.compilerNode.properties.length);
-        const structureToText = new ObjectLiteralElementLikeStructureToText(this.global.manipulationSettings);
+        const newTexts = structures.map(s => {
+            // todo: pass in the StructureToText to the function below
+            const writer = this.getWriter();
+            const structureToText = new ObjectLiteralElementLikeStructureToText(writer);
+            structureToText.writeText(s);
+            return writer.toString();
+        });
 
         insertIntoCommaSeparatedNodes({
             parent: this.getFirstChildByKindOrThrow(ts.SyntaxKind.SyntaxList),
             currentNodes: this.getProperties(),
             insertIndex: index,
-            newTexts: structureToText.getTexts(structures),
+            newTexts,
             useNewlines: true
         });
 

@@ -2,7 +2,7 @@
 import {StructureToText} from "./../StructureToText";
 
 export class ConstructorDeclarationStructureToText extends StructureToText<ConstructorDeclarationStructure> {
-    getText(structure: ConstructorDeclarationStructure) {
-        return `constructor() {${this.getNewlineKind()}}`;
+    writeText(structure: ConstructorDeclarationStructure) {
+        this.writer.write("constructor()").block();
     }
 }

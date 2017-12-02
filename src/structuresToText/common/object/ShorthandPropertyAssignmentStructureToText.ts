@@ -2,7 +2,7 @@
 import {StructureToText} from "./../../StructureToText";
 
 export class ShorthandPropertyAssignmentStructureToText extends StructureToText<ShorthandPropertyAssignmentStructure> {
-    getText(structure: ShorthandPropertyAssignmentStructure) {
-        return `${structure.name}`;
+    writeText(structure: ShorthandPropertyAssignmentStructure) {
+        this.writer.write(`${structure.name}`);
     }
 }

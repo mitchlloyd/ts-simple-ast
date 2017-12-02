@@ -1,25 +1,20 @@
-﻿import {ManipulationSettingsContainer} from "./../../ManipulationSettings";
+﻿import CodeBlockWriter from "code-block-writer";
 import {MethodDeclarationStructure} from "./../../structures";
 import {StructureToText} from "./../StructureToText";
 
 export class MethodDeclarationStructureToText extends StructureToText<MethodDeclarationStructure> {
-    constructor(manipulationSettings: ManipulationSettingsContainer, private readonly opts: { isAmbient: boolean; }) {
-        super(manipulationSettings);
+    constructor(writer: CodeBlockWriter, private readonly opts: { isAmbient: boolean; }) {
+        super(writer);
     }
 
-    getText(structure: MethodDeclarationStructure) {
-        let code = "";
-        if (structure.isStatic)
-            code += "static ";
-        code += `${structure.name}()`;
-        if (structure.returnType != null && structure.returnType.length > 0)
-            code += `: ${structure.returnType}`;
+    writeText(structure: MethodDeclarationStructure) {
+        this.writer.conditionalWrite(structure.isStatic, "static ");
+        this.writer.write(`${structure.name}()`);
+        this.writer.conditionalWrite(structure.returnType != null && structure.returnType.length > 0, `: ${structure.returnType}`);
 
         if (this.opts.isAmbient)
-            code += ";";
+            this.writer.write(";");
         else
-            code += ` {` + this.getNewlineKind() + `}`;
-
-        return code;
+            this.writer.block();
     }
 }

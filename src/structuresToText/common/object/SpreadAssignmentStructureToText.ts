@@ -2,7 +2,7 @@
 import {StructureToText} from "./../../StructureToText";
 
 export class SpreadAssignmentStructureToText extends StructureToText<SpreadAssignmentStructure> {
-    getText(structure: SpreadAssignmentStructure) {
-        return `...${structure.expression}`;
+    writeText(structure: SpreadAssignmentStructure) {
+        this.writer.write(`...${structure.expression}`);
     }
 }

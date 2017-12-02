@@ -1,6 +1,6 @@
-﻿import {ObjectLiteralElementLikeStructures, SpreadAssignmentStructure, PropertyAssignmentStructure, ShorthandPropertyAssignmentStructure} from "./../../../structures";
+﻿import CodeBlockWriter from "code-block-writer";
+import {ObjectLiteralElementLikeStructures, SpreadAssignmentStructure, PropertyAssignmentStructure, ShorthandPropertyAssignmentStructure} from "./../../../structures";
 import * as errors from "./../../../errors";
-import {ManipulationSettingsContainer} from "./../../../ManipulationSettings";
 import {StructureToText} from "./../../StructureToText";
 import {GetAccessorDeclarationStructureToText} from "./../../class/GetAccessorDeclarationStructureToText";
 import {SetAccessorDeclarationStructureToText} from "./../../class/SetAccessorDeclarationStructureToText";
@@ -17,25 +17,25 @@ export class ObjectLiteralElementLikeStructureToText extends StructureToText<Obj
     private readonly setAccessorDeclarationStructureToText: SetAccessorDeclarationStructureToText;
     private readonly methodDeclarationStructureToText: MethodDeclarationStructureToText;
 
-    constructor(manipulationSettings: ManipulationSettingsContainer) {
-        super(manipulationSettings);
-        this.spreadAssignmentStructureToText = new SpreadAssignmentStructureToText(manipulationSettings);
-        this.propertyAssignmentStructureToText = new PropertyAssignmentStructureToText(manipulationSettings);
-        this.shorthandPropertyAssignmentStructureToText = new ShorthandPropertyAssignmentStructureToText(manipulationSettings);
-        this.getAccessorDeclarationStructureToText = new GetAccessorDeclarationStructureToText(manipulationSettings);
-        this.setAccessorDeclarationStructureToText = new GetAccessorDeclarationStructureToText(manipulationSettings);
-        this.methodDeclarationStructureToText = new MethodDeclarationStructureToText(manipulationSettings, {
+    constructor(writer: CodeBlockWriter) {
+        super(writer);
+        this.spreadAssignmentStructureToText = new SpreadAssignmentStructureToText(writer);
+        this.propertyAssignmentStructureToText = new PropertyAssignmentStructureToText(writer);
+        this.shorthandPropertyAssignmentStructureToText = new ShorthandPropertyAssignmentStructureToText(writer);
+        this.getAccessorDeclarationStructureToText = new GetAccessorDeclarationStructureToText(writer);
+        this.setAccessorDeclarationStructureToText = new GetAccessorDeclarationStructureToText(writer);
+        this.methodDeclarationStructureToText = new MethodDeclarationStructureToText(writer, {
             isAmbient: false // it's not ambient in this context
         });
     }
 
-    getText(structure: ObjectLiteralElementLikeStructures) {
+    writeText(structure: ObjectLiteralElementLikeStructures) {
         if (isSpreadAssignmentStructure(structure))
-            return this.spreadAssignmentStructureToText.getText(structure);
+            this.spreadAssignmentStructureToText.writeText(structure);
         else if (isPropertyAssignmentStructure(structure))
-            return this.propertyAssignmentStructureToText.getText(structure);
+            this.propertyAssignmentStructureToText.writeText(structure);
         else if (isShorthandPropertyAssignmentStructure(structure))
-            return this.shorthandPropertyAssignmentStructureToText.getText(structure);
+            this.shorthandPropertyAssignmentStructureToText.writeText(structure);
         else
             throw errors.getNotImplementedForNeverValueError(structure);
     }

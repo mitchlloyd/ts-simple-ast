@@ -2,7 +2,7 @@
 import {StructureToText} from "./../../StructureToText";
 
 export class PropertyAssignmentStructureToText extends StructureToText<PropertyAssignmentStructure> {
-    getText(structure: PropertyAssignmentStructure) {
-        return `${structure.name}: ${structure.initializer}`;
+    writeText(structure: PropertyAssignmentStructure) {
+        this.writer.write(`${structure.name}: ${structure.initializer}`);
     }
 }
