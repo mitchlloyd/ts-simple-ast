@@ -4,7 +4,8 @@ import {ShorthandPropertyAssignmentStructure} from "./ShorthandPropertyAssignmen
 import {SpreadAssignmentStructure} from "./SpreadAssignmentStructure";
 
 // todo: sync with ObjectLiteralElementLike in aliases
-export type ObjectLiteralElementLikeStructures = PropertyAssignmentStructure | ShorthandPropertyAssignmentStructure | SpreadAssignmentStructure;
+export type ObjectLiteralElementLikeStructures = PropertyAssignmentStructure | ShorthandPropertyAssignmentStructure | SpreadAssignmentStructure |
+    MethodDeclarationStructure | GetAccessorDeclarationStructure | SetAccessorDeclarationStructure;
 
 export interface ObjectLiteralExpressionStructure {
     properties: ObjectLiteralElementLikeStructures[];

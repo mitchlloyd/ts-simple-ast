@@ -1,10 +1,12 @@
 ﻿import * as ts from "typescript";
+import CodeBlockWriter from "code-block-writer";
 import * as errors from "./../../../errors";
 import {Expression} from "./../Expression";
 import {Node} from "./../Node";
 import {ObjectLiteralElementLike} from "./../../aliases";
 import {verifyAndGetIndex, insertIntoCommaSeparatedNodes} from "./../../../manipulation";
-import {ObjectLiteralElementLikeStructureToText} from "./../../../structuresToText";
+import {StructureToText, PropertyAssignmentStructureToText, ShorthandPropertyAssignmentStructureToText, SpreadAssignmentStructureToText,
+    GetAccessorDeclarationStructureToText, SetAccessorDeclarationStructureToText, MethodDeclarationStructureToText} from "./../../../structuresToText";
 import {PropertyAssignmentStructure, ShorthandPropertyAssignmentStructure, SpreadAssignmentStructure, ObjectLiteralElementLikeStructures} from "./../../../structures";
 
 export class ObjectLiteralExpression extends Expression<ts.ObjectLiteralExpression> {
@@ -16,42 +18,87 @@ export class ObjectLiteralExpression extends Expression<ts.ObjectLiteralExpressi
         return properties.map(p => this.global.compilerFactory.getNodeFromCompilerNode(p, this.sourceFile)) as ObjectLiteralElementLike[];
     }
 
+    /* Property Assignments */
+
     /**
-     * Adds a property.
-     * @param structure - Structure that represents the property to add.
+     * Adds a property assignment.
+     * @param structure - Structure that represents the property assignment to add.
      */
-    addProperty(structure: ObjectLiteralElementLikeStructures) {
-        return this.addProperties([structure])[0];
+    addPropertyAssignment(structure: PropertyAssignmentStructure) {
+        return this.addPropertyAssignments([structure])[0];
     }
 
     /**
-     * Adds properties.
-     * @param structures - Structure that represents the properties to add.
+     * Adds property assignments.
+     * @param structures - Structure that represents the property assignments to add.
      */
-    addProperties(structures: ObjectLiteralElementLikeStructures[]) {
-        return this.insertProperties(this.compilerNode.properties.length, structures);
+    addPropertyAssignments(structures: PropertyAssignmentStructure[]) {
+        return this.insertPropertyAssignments(this.compilerNode.properties.length, structures);
     }
 
     /**
-     * Inserts a property at the specified index.
+     * Inserts a property assignment at the specified index.
      * @param index - Index to insert.
-     * @param structure - Structure that represents the property to insert.
+     * @param structure - Structure that represents the property assignment to insert.
      */
-    insertProperty(index: number, structure: ObjectLiteralElementLikeStructures) {
-        return this.insertProperties(index, [structure])[0];
+    insertPropertyAssignment(index: number, structure: PropertyAssignmentStructure) {
+        return this.insertPropertyAssignments(index, [structure])[0];
     }
 
     /**
-     * Inserts properties at the specified index.
+     * Inserts property assignments at the specified index.
      * @param index - Index to insert.
-     * @param structures - Structures that represent the properties to insert.
+     * @param structures - Structures that represent the property assignments to insert.
      */
-    insertProperties(index: number, structures: ObjectLiteralElementLikeStructures[]) {
+    insertPropertyAssignments(index: number, structures: PropertyAssignmentStructure[]) {
+        return this._insertProperty(index, structures, writer => new PropertyAssignmentStructureToText(writer));
+    }
+
+    /* Shorthand Property Assignments */
+
+    /**
+     * Adds a shorthand property assignment.
+     * @param structure - Structure that represents the property assignment to add.
+     */
+    addShorthandPropertyAssignment(structure: ShorthandPropertyAssignmentStructure) {
+        return this.addShorthandPropertyAssignments([structure])[0];
+    }
+
+    /**
+     * Adds shorthand property assignments.
+     * @param structures - Structure that represents the shorthand property assignments to add.
+     */
+    addShorthandPropertyAssignments(structures: ShorthandPropertyAssignmentStructure[]) {
+        return this.insertShorthandPropertyAssignments(this.compilerNode.properties.length, structures);
+    }
+
+    /**
+     * Inserts a shorthand property assignment at the specified index.
+     * @param index - Index to insert.
+     * @param structure - Structure that represents the shorthand property assignment to insert.
+     */
+    insertShorthandPropertyAssignment(index: number, structure: ShorthandPropertyAssignmentStructure) {
+        return this.insertShorthandPropertyAssignments(index, [structure])[0];
+    }
+
+    /**
+     * Inserts shorthand property assignments at the specified index.
+     * @param index - Index to insert.
+     * @param structures - Structures that represent the shorthand property assignments to insert.
+     */
+    insertShorthandPropertyAssignments(index: number, structures: ShorthandPropertyAssignmentStructure[]) {
+        return this._insertProperty(index, structures, writer => new ShorthandPropertyAssignmentStructureToText(writer));
+    }
+
+    /**
+     * @internal
+     */
+    private _insertProperty<T>(index: number, structures: T[], createStructureToText: (writer: CodeBlockWriter) => StructureToText<T>) {
         index = verifyAndGetIndex(index, this.compilerNode.properties.length);
         const newTexts = structures.map(s => {
             // todo: pass in the StructureToText to the function below
             const writer = this.getWriter();
-            const structureToText = new ObjectLiteralElementLikeStructureToText(writer);
+            const structureToText = createStructureToText(writer);
             structureToText.writeText(s);
             return writer.toString();
         });
