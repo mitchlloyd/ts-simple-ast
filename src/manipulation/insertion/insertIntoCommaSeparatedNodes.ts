@@ -11,12 +11,13 @@ export interface InsertIntoCommaSeparatedNodesOptions {
 }
 
 export function insertIntoCommaSeparatedNodes(opts: InsertIntoCommaSeparatedNodesOptions) {
+    // todo: this needs to be fixed/cleaned up in the future, but this is good enough for now
     const {currentNodes, insertIndex, newTexts, parent} = opts;
     const nextNode = currentNodes[insertIndex];
     const previousNode = currentNodes[insertIndex - 1];
     const numberOfSyntaxListItemsInserting = newTexts.length * 2 - 1;
     const separator = getSeparator();
-    let newText = newTexts.join(`,${separator}`);
+    let newText = newTexts.join(`,${opts.useNewlines ? parent.global.manipulationSettings.getNewLineKind() : " "}`).replace(/^\s+/, "");
 
     if (nextNode != null) {
         insertIntoParent({
