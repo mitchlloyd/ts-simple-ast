@@ -253,9 +253,6 @@ export class SourceFile extends SourceFileBase<ts.SourceFile> {
                 updateStringLiteralReferences(literalReferences);
             // update the string literals in other files
             updateStringLiteralReferences(referencingLiterals.map(node => ([node, currentSourceFile]) as [StringLiteral, SourceFile]));
-
-            // everything should be up to date, so ignore any modifications above
-            currentSourceFile.global.lazyReferenceCoordinator.clearDirtySourceFiles();
         }
     }
 
